@@ -1,10 +1,9 @@
-public interface IItemVisitable
+public interface IDamageVisitable
 {
-    public void Accept(IItemVisitor visitor);
+    public void Accept(IDamageVisitor visitor);
 }
 
-public interface IItemVisitor
+public interface IDamageVisitor
 {
-    public void Visit(HealItem healItem);
-    public void Visit(PowerUpItem powerUpItem);
+    public void Visit(Bullet bullet);
 }

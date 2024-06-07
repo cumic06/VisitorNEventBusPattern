@@ -1,25 +1,48 @@
 using UnityEngine;
 
-public class Enemy : MonoBehaviour, IItemVisitor
+public class Enemy : MonoBehaviour, IDamageVisitor
 {
     public int Hp = 50;
     public int Power = 5;
+    [SerializeField] private Player target;
+    [SerializeField] private bool isFollow;
 
-    private void OnTriggerEnter(Collider other)
+    private void FixedUpdate()
     {
-        if (other.TryGetComponent(out IItemVisitable item))
+        if (isFollow)
         {
-            item.Accept(this);
+            FollowPlayer();
         }
     }
 
-    public void Visit(HealItem healItem)
+    private void FollowPlayer()
     {
-        Hp += (int)healItem.Value;
+        Vector3 moveVec = target.transform.position - transform.position;
+        transform.Translate(moveVec * Time.deltaTime);
     }
 
-    public void Visit(PowerUpItem powerUpItem)
+    private void OnTriggerEnter(Collider other)
     {
-        Power += (int)powerUpItem.Value;
+        if (other.TryGetComponent(out IDamageVisitable bullet))
+        {
+            Debug.Log("Enemey");
+            bullet.Accept(this);
+        }
+    }
+
+    public void Visit(Bullet bullet)
+    {
+        if (Hp <= 0)
+        {
+            OnDead();
+            return;
+        }
+        Hp -= bullet.GetDamage();
+    }
+
+    private void OnDead()
+    {
+        Debug.Log("EnemyDead");
+        Destroy(gameObject);
     }
 }

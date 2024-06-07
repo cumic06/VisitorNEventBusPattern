@@ -1,25 +1,32 @@
 using UnityEngine;
 
-public class Player : MonoBehaviour, IItemVisitor
+public class Player : MonoBehaviour, IDamageVisitor
 {
     public int Hp = 100;
     public int Power = 10;
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.TryGetComponent(out IItemVisitable item))
+        if (other.TryGetComponent(out IDamageVisitable bullet))
         {
-            item.Accept(this);
+            Debug.Log("Player");
+            bullet.Accept(this);
         }
     }
 
-    public void Visit(HealItem healItem)
+    public void Visit(Bullet bullet)
     {
-        Hp += (int)healItem.Value;
+        if (Hp <= 0)
+        {
+            OnDead();
+            return;
+        }
+        Hp -= bullet.GetDamage();
     }
 
-    public void Visit(PowerUpItem powerUpItem)
+    private void OnDead()
     {
-        Power += (int)powerUpItem.Value;
+        Debug.Log("PlayerDead");
+        EventBus.Publish(GameState.GameOver);
     }
 }

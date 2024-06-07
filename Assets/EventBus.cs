@@ -6,7 +6,8 @@ public enum GameState
 {
     Play,
     Pause,
-    End
+    GameOver,
+    GameClear
 }
 
 public class EventBus : MonoBehaviour
@@ -15,25 +16,29 @@ public class EventBus : MonoBehaviour
 
     public static void Subscribe(GameState state, Action action)
     {
-        if (!eventDic.ContainsValue(action))
+        if (!eventDic.ContainsKey(state))
         {
             eventDic.Add(state, action);
+        }
+        else
+        {
+            eventDic[state] -= action;
         }
     }
 
     public static void UnSubscribe(GameState state, Action action)
     {
-        if (eventDic.TryGetValue(state, out Action removeAction))
+        if (eventDic.ContainsValue(action))
         {
-            eventDic[state] -= removeAction;
+            eventDic[state] -= action;
         }
     }
 
     public static void Publish(GameState state)
     {
-        if (eventDic.TryGetValue(state, out Action invokeAction))
+        if (eventDic.ContainsKey(state))
         {
-            invokeAction?.Invoke();
+            eventDic[state]?.Invoke();
         }
     }
 }
